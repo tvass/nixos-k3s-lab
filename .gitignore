@@ -1,0 +1,4 @@
+result
+*.qcow2
+*.img
+local.nix

@@ -1,0 +1,7 @@
+{
+  bridge = "br0";
+
+  sshKeys = [
+    "ssh-rsa YOUR_PUBLIC_KEY user@host"
+  ];
+}
