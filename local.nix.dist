@@ -1,4 +1,7 @@
 {
+# Make sure qemu canb use br0:
+# echo "allow br0" | sudo tee /etc/qemu/bridge.conf
+#
   bridge = "br0";
 
   sshKeys = [

@@ -3,6 +3,8 @@ set -euo pipefail
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
+NIX_EXTRA_EXPERIMENTAL_FEATURES=(--extra-experimental-features nix-command --extra-experimental-features flakes)
+
 MAC=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -24,12 +26,12 @@ for cmd in arp nix virsh virt-install nc uuidgen scp k9s jq; do
 done
 
 
-BRIDGE=$(FLAKE_DIR="${DIR}" nix eval --raw --impure "${DIR}/nix#localConfig.bridge")
+BRIDGE=$(FLAKE_DIR="${DIR}" nix "${NIX_EXTRA_EXPERIMENTAL_FEATURES[@]}" eval --raw --impure "${DIR}/nix#localConfig.bridge")
 VM_USER="k3s"
 HOST_IP=$(ip -o -f inet addr show "${BRIDGE}" | awk '{print $4}' | cut -d/ -f1)
 echo "Host IP: ${HOST_IP}"
 
-FLAKE_DIR="${DIR}" HOST_IP="${HOST_IP}" nix build "${DIR}/nix#" --impure --out-link "${DIR}/result"
+FLAKE_DIR="${DIR}" HOST_IP="${HOST_IP}" nix "${NIX_EXTRA_EXPERIMENTAL_FEATURES[@]}" build "${DIR}/nix#" --impure --out-link "${DIR}/result"
 
 UUID=$(uuidgen)
 QCOW="${DIR}/k3s-vm-${UUID}.qcow2"
