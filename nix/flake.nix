@@ -25,6 +25,10 @@
         format = "qcow";
         modules = [
           ./k3s-vm.nix
+          (if local ? dns then {
+            networking.nameservers = [ local.dns ];
+            networking.dhcpcd.extraConfig = "nohook resolv.conf";
+          } else {})
           {
             users.users.k3s.openssh.authorizedKeys.keys = local.sshKeys;
             systemd.services.ping-host = {

@@ -2,7 +2,7 @@
 
 {
   networking.hostName = "k3s-vm";
-  networking.firewall.allowedTCPPorts = [ 22 6443 10250 ];
+  networking.firewall.allowedTCPPorts = [ 22 6443 9443 10250 ];
   networking.firewall.allowedUDPPorts = [ 8472 ];
   networking.dhcpcd.wait = "any";
 
@@ -23,6 +23,18 @@
       PasswordAuthentication = false;
     };
   };
+
+  environment.etc."rancher/k3s/registries.yaml".text = ''
+    mirrors:
+      registry.lan:
+        endpoint:
+          - "https://registry.lan"
+
+    configs:
+      registry.lan:
+        tls:
+          insecure_skip_verify: true
+  '';
 
   services.k3s = {
     enable = true;

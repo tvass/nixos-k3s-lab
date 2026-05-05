@@ -4,4 +4,7 @@
   sshKeys = [
     "ssh-rsa YOUR_PUBLIC_KEY user@host"
   ];
+
+  # Optional: override DHCP DNS
+  # dns = "192.168.0.1";
 }
