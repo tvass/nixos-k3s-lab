@@ -29,6 +29,9 @@
             networking.nameservers = [ local.dns ];
             networking.dhcpcd.extraConfig = "nohook resolv.conf";
           } else {})
+          (if local ? disableAlgifAead && local.disableAlgifAead then {
+            boot.kernelParams = [ "initcall_blacklist=algif_aead_init" ];
+          } else {})
           {
             users.users.k3s.openssh.authorizedKeys.keys = local.sshKeys;
             systemd.services.ping-host = {

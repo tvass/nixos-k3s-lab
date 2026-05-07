@@ -10,4 +10,7 @@
 
   # Optional: override DHCP DNS
   # dns = "192.168.0.1";
+
+  # Optional: disable algif_aead kernel module (CVE-2026-31431 mitigation)
+  # disableAlgifAead = true;
 }

@@ -1,6 +1,8 @@
 { pkgs, ... }:
 
 {
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   networking.hostName = "k3s-vm";
   networking.firewall.allowedTCPPorts = [ 22 6443 9443 10250 ];
   networking.firewall.allowedUDPPorts = [ 8472 ];
