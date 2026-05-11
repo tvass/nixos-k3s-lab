@@ -2,3 +2,4 @@ result
 *.qcow2
 *.img
 local.nix
+vm-hosts.log

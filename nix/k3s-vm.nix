@@ -15,6 +15,8 @@
     openssh.authorizedKeys.keys = [];
   };
 
+  services.getty.autologinUser = "k3s";
+
   security.sudo.wheelNeedsPassword = false;
   users.users.root.hashedPassword = "!";
 

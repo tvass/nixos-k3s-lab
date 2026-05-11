@@ -61,6 +61,7 @@ until [[ -n "${VM_IP}" ]]; do
   sleep 1
 done
 echo "VM IP: ${VM_IP}"
+echo "${VM_IP}:${MAC}" >> "${DIR}/vm-hosts.log"
 
 KUBECONFIG_TMP="/tmp/k3s-${VM_IP}.yaml"
 SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/id_rsa"
