@@ -3,3 +3,4 @@ result
 *.img
 local.nix
 vm-hosts.log
+result-agent
