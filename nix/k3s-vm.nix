@@ -1,44 +1,10 @@
 { pkgs, ... }:
 
 {
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  imports = [ ./base.nix ];
 
   networking.hostName = "k3s-vm";
   networking.firewall.allowedTCPPorts = [ 22 6443 9443 10250 ];
-  networking.firewall.allowedUDPPorts = [ 8472 ];
-  networking.dhcpcd.wait = "any";
-
-
-  users.users.k3s = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" ];
-    openssh.authorizedKeys.keys = [];
-  };
-
-  services.getty.autologinUser = "k3s";
-
-  security.sudo.wheelNeedsPassword = false;
-  users.users.root.hashedPassword = "!";
-
-  services.openssh = {
-    enable = true;
-    settings = {
-      PermitRootLogin = "prohibit-password";
-      PasswordAuthentication = false;
-    };
-  };
-
-  environment.etc."rancher/k3s/registries.yaml".text = ''
-    mirrors:
-      registry.lan:
-        endpoint:
-          - "https://registry.lan"
-
-    configs:
-      registry.lan:
-        tls:
-          insecure_skip_verify: true
-  '';
 
   services.k3s = {
     enable = true;
@@ -47,15 +13,6 @@
     extraFlags = "--write-kubeconfig-mode 644 --disable traefik";
   };
 
-  environment.systemPackages = with pkgs; [
-    kubectl
-    curl
-    git
-  ];
-
+  environment.systemPackages = with pkgs; [ kubectl ];
   environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
-
-  virtualisation.diskSize = 18 * 1024; # 18 GB (default 8 GB + 10 GB extra)
-
-  system.stateVersion = "24.11";
 }

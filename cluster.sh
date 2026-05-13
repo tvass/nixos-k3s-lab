@@ -25,8 +25,8 @@ done
 
 SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/id_rsa"
 BRIDGE=$(FLAKE_DIR="${DIR}" nix "${NIX_EXTRA[@]}" eval --raw --impure "${DIR}/nix#localConfig.bridge")
+HOST_IP=$(ip -o -f inet addr show "${BRIDGE}" | awk '{print $4}' | cut -d/ -f1)
 VM_USER="k3s"
-LAST_MAC=""
 
 wait_port() {
   local ip="$1" port="$2"
@@ -35,7 +35,6 @@ wait_port() {
   echo "  ${port} open"
 }
 
-# Creates a VM and prints its IP; sets LAST_MAC
 create_vm() {
   local name="$1" qcow="$2" mac_hint="${3:-}"
   local net_arg="bridge=${BRIDGE}"
@@ -51,16 +50,16 @@ create_vm() {
     --network "${net_arg}" \
     --noautoconsole >&2
 
-  LAST_MAC=$(virsh domiflist "${name}" | awk -v br="${BRIDGE}" '$0 ~ br {print $5}')
-  echo "MAC: ${LAST_MAC} — waiting for ARP entry..." >&2
+  local mac ip=""
+  mac=$(virsh domiflist "${name}" | awk -v br="${BRIDGE}" '$0 ~ br {print $5}')
+  echo "MAC: ${mac} — waiting for ARP entry..." >&2
 
-  local ip=""
   until [[ -n "${ip}" ]]; do
-    ip=$(arp -n | awk -v m="${LAST_MAC}" 'tolower($3)==tolower(m) && $1!~/^169\.254/ {print $1; exit}')
+    ip=$(arp -n | awk -v m="${mac}" 'tolower($3)==tolower(m) && $1!~/^169\.254/ {print $1; exit}')
     sleep 1
   done
 
-  echo "${ip}:${LAST_MAC}" >> "${DIR}/vm-hosts.log"
+  echo "${ip}:${mac}" >> "${DIR}/vm-hosts.log"
   echo "${ip}"
 }
 
@@ -72,8 +71,7 @@ add_agent() {
   ((expected_nodes++))
 
   echo "Building agent image..."
-  FLAKE_DIR="${DIR}" \
-  HOST_IP="$(ip -o -f inet addr show "${BRIDGE}" | awk '{print $4}' | cut -d/ -f1)" \
+  FLAKE_DIR="${DIR}" HOST_IP="${HOST_IP}" \
   SERVER_ADDR="https://${server_ip}:6443" \
   K3S_TOKEN="$(cat "/tmp/k3s-token-${server_ip}")" \
     nix "${NIX_EXTRA[@]}" build "${DIR}/nix#agent" --impure --out-link "${DIR}/result-agent"
@@ -98,7 +96,6 @@ add_agent() {
 }
 
 # ── server ────────────────────────────────────────────────────────────────────
-HOST_IP=$(ip -o -f inet addr show "${BRIDGE}" | awk '{print $4}' | cut -d/ -f1)
 echo "Host IP: ${HOST_IP}"
 
 FLAKE_DIR="${DIR}" HOST_IP="${HOST_IP}" \
@@ -126,6 +123,7 @@ sed -i \
   -e "s|https://127.0.0.1:6443|https://${VM_IP}:6443|g" \
   -e "s|\bdefault\b|${CLUSTER_NAME}|g" \
   "${KUBECONFIG_TMP}"
+
 echo "Waiting for node token..."
 until ssh -q ${SSH_OPTS} "${VM_USER}@${VM_IP}" "sudo test -f /var/lib/rancher/k3s/server/node-token" 2>/dev/null; do sleep 2; done
 ssh -q ${SSH_OPTS} "${VM_USER}@${VM_IP}" "sudo cat /var/lib/rancher/k3s/server/node-token" > "/tmp/k3s-token-${VM_IP}"
