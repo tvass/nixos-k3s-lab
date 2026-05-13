@@ -1,6 +1,6 @@
 # NixOS K3s on KVM
 
-Builds a NixOS qcow2 image with k3s, boots it in KVM, and opens k9s.
+Spins up a NixOS-based k3s cluster on KVM — single node or multi-node — for testing Kubernetes components such as ingress controllers, service meshes, and datastores.
 
 ## Requirements
 
@@ -27,7 +27,7 @@ cp local.nix.dist local.nix
 ```bash
 ./cluster.sh                             # 1-node cluster (control plane as worker)
 ./cluster.sh --nodes 3                   # 1 server + 2 agents
-./cluster.sh --mac 52:54:00:ab:cd:ef    # fix MAC (stable DHCP lease)
+./cluster.sh --mac 52:54:00:ab:cd:ef
 ```
 
 When the cluster is ready, k9s opens automatically. The kubeconfig is saved to `/tmp/k3s-<ip>.yaml`.
@@ -40,6 +40,7 @@ When the cluster is ready, k9s opens automatically. The kubeconfig is saved to `
 | `sshKeys` | yes | List of SSH public keys for the `k3s` user |
 | `dns` | no | Override DHCP DNS server |
 | `disableAlgifAead` | no | Disable `algif_aead` kernel module (CVE-2026-31431 mitigation) |
+| `useEtcd` | no | Run etcd as a separate process and use it as the k3s datastore instead of SQLite |
 
 ## vm-hosts.log
 

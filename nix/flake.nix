@@ -65,6 +65,12 @@
           (if local ? disableAlgifAead && local.disableAlgifAead then {
             boot.kernelParams = [ "initcall_blacklist=algif_aead_init" ];
           } else {})
+          (if local ? useEtcd && local.useEtcd then {
+            services.etcd.enable = true;
+            services.k3s.extraFlags = nixpkgs.lib.mkForce "--write-kubeconfig-mode 644 --disable traefik --datastore-endpoint=http://127.0.0.1:2379";
+            systemd.services.k3s.after = [ "etcd.service" ];
+            systemd.services.k3s.wants = [ "etcd.service" ];
+          } else {})
           {
             users.users.k3s.openssh.authorizedKeys.keys = local.sshKeys;
             systemd.services.ping-host = {
