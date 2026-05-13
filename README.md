@@ -1,6 +1,9 @@
-# NixOS K3s on KVM
+# NixOS K3s Lab (Linux/KVM)
 
-Spins up a NixOS-based k3s cluster on KVM — single node or multi-node — for testing Kubernetes components such as ingress controllers, service meshes, and datastores.
+while(1) { create, deploy, test, delete }
+
+Spins up NixOS-based k3s clusters on QEMU/KVM/libvirt. I use it for testing ingress controllers, service meshes, datastores, or failure scenarios.
+
 
 ## Requirements
 
