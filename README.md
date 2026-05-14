@@ -45,6 +45,10 @@ When the cluster is ready, k9s opens automatically. The kubeconfig is saved to `
 | `disableAlgifAead` | no | Disable `algif_aead` kernel module (CVE-2026-31431 mitigation) |
 | `useEtcd` | no | Run etcd as a separate process and use it as the k3s datastore instead of SQLite |
 
+## Network keepalive
+
+Each VM runs a `ping-host` systemd service that continuously pings the KVM host. This keeps the ARP entry alive on the host so the VM remains discoverable without a static lease.
+
 ## vm-hosts.log
 
 Each run appends `ip:mac` to `vm-hosts.log` (gitignored). Useful for looking up MAC addresses when resuming VMs that were off.

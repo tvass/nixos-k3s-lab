@@ -15,6 +15,8 @@
 
 ## Git
 
-- When committing, always add as co-author:
-  `Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>`
+- When committing, always add as co-author using your actual model name:
+  `Co-Authored-By: <model name> <noreply@anthropic.com>`
+  e.g. `Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>`
 - The blank line before the trailer is required for GitHub to recognize it.
+- Always use `/bin/cat` in commit heredocs — `cat` is aliased to `ccat` on this machine and corrupts commit messages with color codes.

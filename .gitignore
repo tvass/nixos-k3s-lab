@@ -4,3 +4,4 @@ result
 local.nix
 vm-hosts.log
 result-agent
+.claude/settings.local.json
