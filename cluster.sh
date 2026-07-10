@@ -6,10 +6,14 @@ NIX_EXTRA=(--extra-experimental-features nix-command --extra-experimental-featur
 
 NODES=1
 MAC=""
+CPUS=2
+MEMORY=2048
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --nodes) NODES="$2"; shift 2 ;;
-    --mac)   MAC="$2";   shift 2 ;;
+    --nodes)  NODES="$2";  shift 2 ;;
+    --mac)    MAC="$2";    shift 2 ;;
+    --cpus)   CPUS="$2";   shift 2 ;;
+    --memory) MEMORY="$2"; shift 2 ;;
     *) echo "unknown argument: $1"; exit 1 ;;
   esac
 done
@@ -42,8 +46,8 @@ create_vm() {
 
   virt-install \
     --name "${name}" \
-    --memory 2048 \
-    --vcpus 2 \
+    --memory "${MEMORY}" \
+    --vcpus "${CPUS}" \
     --disk path="${qcow}",format=qcow2 \
     --import \
     --os-variant nixos-unstable \
